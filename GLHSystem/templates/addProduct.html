@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body_block %}
+
+<!--Only producers should be able to acess this page-->
+<h1>Create New Product</h1>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+<button type="submit">Create</button>
+
+  
+  </form>
+{% endblock %}

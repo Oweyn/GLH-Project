@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block body_block %}
+
+<div class="block">
+<h1>Welcome to Greenfield Local Hub</h1>
+<h2>Below is the story of our humble beginnings.</h2>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent scelerisque commodo feugiat. Curabitur dapibus, ligula vitae cursus cursus, magna sapien dictum lorem, non tempus nunc sapien ac ex. Quisque et nulla lobortis, pretium nibh a, sagittis elit. Donec cursus tortor id dui euismod, vel pharetra magna placerat. Mauris volutpat venenatis metus vitae tempus. Donec vitae tempor quam. Sed tempus, mauris eu interdum tempor, tortor sem eleifend justo, vel pulvinar risus massa non libero. Sed scelerisque, libero ac gravida hendrerit, nulla erat faucibus arcu, vitae placerat sapien arcu vel risus. Sed volutpat, sem at ultricies venenatis, arcu urna rutrum libero, vitae dictum nunc eros in dolor. Phasellus imperdiet elit nec viverra tincidunt. Praesent lacinia, ante vel efficitur feugiat, libero ex pharetra nisl, at gravida lacus diam et nibh.</p>
+<p>Curabitur vel sollicitudin nisi. Nam eleifend arcu vel vehicula ultricies. Duis non purus euismod, laoreet sem id, consectetur est. Sed elit lacus, tempus at commodo a, feugiat finibus est. Mauris accumsan convallis sodales. Fusce ullamcorper accumsan vestibulum. Proin eget metus libero. Donec congue sem est, ut hendrerit nulla facilisis eu. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Maecenas porttitor hendrerit dui, vel dignissim dui.</p>
+<p>Etiam sit amet quam mattis, tempus tellus et, sodales nisi. Vestibulum egestas dui in feugiat pharetra. Integer dignissim convallis mauris ut fermentum. Proin feugiat, odio in mollis ornare, tellus ipsum cursus dolor, a tristique leo odio id justo. Donec sed neque convallis, imperdiet ipsum non, gravida lacus. Morbi accumsan volutpat libero, at luctus quam accumsan non. Aliquam consequat et erat vitae laoreet. Proin vel lacinia nisi, et ullamcorper purus. Nunc aliquam dui auctor lorem tempus, ut accumsan ipsum imperdiet. Morbi pellentesque orci eu risus pellentesque, non maximus lectus euismod. In et justo eget nibh laoreet posuere. Proin at vestibulum sapien, ac vehicula arcu. Quisque vel nunc rutrum, vehicula ligula sed, suscipit odio.</p>
+</div>
+
+<div class="block">
+<p>Before using or purchasing from us through our site, please have a look at our privacy policy and terms of conditions. Please do not hesitate to contact us if you have any concerns.</p>
+<!--TODO: Need to add a contact us form-->
+<p><a href="{% url 'index' %}">Our Privacy Policy</a></p>
+<a href="{% url 'index' %}">Our Terms & Conditions</a>
+</div>
+{% endblock %}

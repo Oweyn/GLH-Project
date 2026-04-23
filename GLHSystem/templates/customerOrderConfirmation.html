@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block body_block %}
+
+<div class="block">
+  <h1>Order Placed</h1>
+  <p>You were successful in placing your order, our producers are working hard to get it to you as fast as possible. <br>If you need support regarding this order please use the refrence number #{{ order.id }}.</p>
+  {% if order.delivery_order == false %}
+  <p>Your order is for collection, you will receive an email when its ready</p>
+  {% else %}
+  <p>Your order is for delivery, you will receive an email when it has been shipped</p>
+  {% endif %}
+  <p>Total paid: £{{ order.total_order_price }}</p>
+  <p>Loyalty points earned: {{ order.loyalty_points_earned }}</p>
+  <a href="{% url 'product' %}" class="btn btn-success mt-3">Continue shopping</a>
+</div>
+
+{% endblock %}

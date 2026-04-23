@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block body_block %}
+
+<h1>Customer Checkout</h1>
+<div class="row block">
+<div class="row alternativeblock">
+
+<!--Shows items in customers cart-->
+{% for item in items %}
+<div class="col-sm-6 col-md-4 col-lg-3 mb-4 block">
+<img src="{{ item.cart_product.image.url }}" alt="{{ item.cart_product.name }}" width="100">
+        <h2>{{ item.cart_product.name }}</h2>
+        <p>{{ item.cart_product.description }}</p>
+        <p>Price: £{{ item.cart_product.price }} x {{item.quantity}} = {{item.item_total}}</p>
+        </div>
+    {% endfor %}
+
+
+  <form method="post" action="{% url 'customerPlacesOrder' %}">
+      {% csrf_token %}
+
+  <!-- Customer form that stores delivery infromation if needed-->
+        <p><label>Would you rather have your parcel delivered straight to your door of pick up in person from out charming Greenfield Local Hub store?</label></p>
+        <p></p><input type="radio" name="customer_order_type" id="collection" value="collection" onchange="hideDeliveryBox()">
+          <label for="collection">I'll collect from GLH store!</label></p>
+        <p><input type="radio" name="customer_order_type" id="delivery" value="Delivery" onchange="hideDeliveryBox()">
+        <label for="delivery">I'd prefer Home Delivery!</label></p>
+
+  <!-- Toggable delivery address box -->
+      <div id="delivery-address-box">
+        <label for="delivery_address">Delivery address:</label>
+        <textarea name="customer_delivery_address" id="customer_delivery_address" class="form-control" rows="3" placeholder="Please enter your full delivery address"></textarea>
+      </div>
+
+  <!--This is a fake payment form and will eventually incoperate stripe to be used in production-->
+       <p><label>Payment details:</label>
+        <input type="text" class="form-control mb-2" placeholder="Please enter your cart details">
+        <div class="row">
+          <div class="col"><input type="text" class="form-control" placeholder="MM/YY"></div>
+          <div class="col"><input type="text" class="form-control" placeholder="CVV"></div>
+        </div></p>
+
+      <p><button type="submit" class="btn btn-success btn-lg w-100">Place Order — £{{ cart_subtotal }}</button></p>
+    </form>
+  </div>
+
+{% endblock %}

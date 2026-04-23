@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block body_block %}
+<h1>Our Products</h1>
+
+<!--Allows users to filter by allergens-->
+<button type="button" class="product-filter-button block">Product filters</button>
+<form method="GET" class="collapsible-filter-content hide-filter-mode block">
+    <h2>Filter by allergens:</h2>
+        {% for allergen in allergens %}
+        <label>
+            <input type="checkbox" name="product_allergens" value="{{ allergen.id }}">{{ allergen.allergen_name }}
+        </label>
+        <br>
+        {% endfor %}
+    <button type="submit" class="block">Apply Filter</button>
+</form>
+
+<!--Displays all products-->
+<div class="row alternativeblock">
+{% for product in products %}
+<div class="col-sm-6 col-md-4 col-lg-3 mb-4 block product-item">
+        <a href="{% url 'individualProductPage' product.pk %}">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" width="100">
+        </a>
+        <h3>{{ product.name }}</h3>
+        <p>{{ product.description }}</p>
+        <p>Price: £{{ product.price }}</p>
+        <p>Allergens:
+        {% for allergen in product.product_allergens.all %}
+            <b>{{allergen}}</b> {% if not forloop.last %},{% endif %}{% endfor %}</p>
+        <a href="{% url 'addProductToUserCart' product.id %}">Add to cart</a>
+        </div>
+    {% endfor %}
+{% endblock %}

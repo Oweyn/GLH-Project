@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block body_block %}
+
+<h1>Our Producers</h1>
+<div class="container">
+    <div class="row">
+
+{% for producer in producers %}
+<div class="col-sm-6 col-md-4 col-lg-3 mb-4 block product-item">
+        <a href="{% url 'individualProducerPage' producer.pk %}">
+        {% if producer.image %}
+            <img src="{{ producer.image.url }}" alt="{{ producer.name }}" class="img-fluid">
+        {% endif %}
+        </a>
+        <h2>{{ producer.store_name }}</h2>
+        <p>{{ producer.user.first_name }} {{ producer.user.last_name }}</p>
+        <p>{{ producer.description }}</p>
+</div>
+{% endfor %}
+        </div>
+        </div>
+{% endblock %}

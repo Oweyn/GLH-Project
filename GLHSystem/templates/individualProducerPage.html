@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block body_block %}
+
+    <div class="block">
+    <h1>Our Producers</h1>
+
+    <img src="{{ producer.image.url }}" alt="{{ producer.name }}" width="400">
+    <h2>{{ producer.user.first_name }} {{ producer.user.last_name }}</h2>
+    <p>{{ producer.store_name }}</p>
+    <p>{{ producer.description }}</p>
+
+    <p>{{ producer.store_name }}'s Products:</p>
+
+
+<!--Shows an individual producer and allows users to look through only there items-->
+    <div class="row">
+    {% for product in products %}
+        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+        <li class="product-item">
+        <a href="{% url 'individualProductPage' product.pk %}">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" width="100">
+        </a>
+        <h2>{{ product.name }}</h2>
+        <p>{{ product.description }}</p>
+        <p>Price: £{{ product.price }}</p>
+        <p>Allergens:
+        {% for allergen in product.allergens.all %}
+        <b>{{allergen}}</b> {% if not forloop.last %},{% endif %}{% endfor %}</p>
+        <a href="#" class="buy-now-button">Buy Now</a>
+        </li>
+        </div>
+    {% endfor %}
+        </div>
+    </div>
+{% endblock %}

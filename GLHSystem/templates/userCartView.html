@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body_block %}
+<h1>Your Cart</h1>
+
+<ul class="product-list alternativeblock">
+<div class="container">
+<div class="row">
+
+<!--Shows item currently in users cart-->
+  {% for item in cart_items %}
+    <div class="col-sm-6 col-md-4 col-lg-3 mb-4 block">
+    <li class="product-item">
+      <a href="{% url 'individualProductPage' item.product.pk %}">
+        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" width="100">
+      </a>
+      <h2>{{ item.product.name }}</h2>
+      <p>{{ item.product.description }}</p>
+      <p>Price: £{{ item.product.price }}</p>
+      <p>Allergens:
+      {% for allergen in item.product.product_allergens.all %}
+      <b>{{ allergen }}</b>
+      {% endfor %}</p>
+
+      <!--Allows the user to increase and decrease quantity of items in cart-->
+      <p><a href="{% url 'decreaseProductQuantityOrDeleteProductInCart' item.product.pk %}"><button class="bi bi-dash"></button></a>
+         {{ item.quantity }} added 
+         <a href="{% url 'increaseProductQuantityInCart' item.product.pk %}"><button class="bi bi-plus-lg"></button></a></p>
+    </li>
+    </div>
+  {% endfor %}
+  <p>Subtotal: £{{ cart_subtotal }}</p>
+  <p>Delivery charges may apply</p>
+  <a href="{% url 'checkoutAndConfirmOrderDetails' %}" class="btn btn-success mt-3">Proceed to Checkout</a>
+  </div>
+  </div>
+  </ul>
+{% endblock %} 

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block body_block %}
+
+<h1>Register or Login</h1>
+<form class="block" method='POST' action=''>
+    {% csrf_token %} <!--Django way to safely trasport data-->
+    {{form.as_p}}
+<input type="submit" name="Register">
+<p>Already apart of GLH? <a href="{% url 'login' %}">Login here</a></p>
+</form>
+
+{% endblock %}

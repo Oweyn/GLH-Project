@@ -1,0 +1,89 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/jpeg" href="{% static 'Images/GLH temporary logo.JPG' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--This links the website to bootstrap for easy and quick styling-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!--This link allows the use of bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"> <!--Bootsrtap icons-->
+    <!-- The link allows for the bootstrap javascript to work--><!-- TODO: Consider replacing bootstrap with custom CSS if theres enough time -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'CSS/GLHStyles.css' %}">
+    <title>GreenField Local Hub</title>
+</head>
+<body>
+  <!--Left hand side of the nav bar-->
+  <nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-item" href="/"><img class= "logo"src="{% static 'Images/GLH temporary logo.JPG' %}" alt="GLH logo"></a>
+  
+    <!--This is what makes the website reactive, it creates the hamburger menu the user is able to click on-->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav">
+        <li class="nav-item navbar">
+          <a class="nav-link" href="{% url 'index' %}">GreenField Local Hub</a>
+        </li>
+        <li class="nav-item navbar">
+          <a class="nav-link" href="{% url 'aboutUs' %}">About Us</a>
+        </li>
+        <li class="nav-item navbar">
+          <a class="nav-link" href="{% url 'producer' %}">Our Producers</a>
+        </li>
+        <li class="nav-item navbar">
+          <a class="nav-link" href="{% url 'product' %}">Our Products</a>
+        </li>
+      </ul>
+
+      <!-- Search bar -->
+      <form class="d-flex flex-grow-1 position-relative mx-3" id="main-search-bar-form">
+        <input class="form-control pe-4" id="search-bar-input" type="search" placeholder="Search on this page">
+        <button class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-2 naked-button" type="submit" id="search-bar-input"></button>
+      </form>
+      
+      <!--Right hand side of the navigation bar-->
+      <ul class="navbar-nav ms-auto">
+        {% if user.is_producer == True %}
+          <li class="nav-item navbar">
+            <a class="nav-link" href="{% url 'producerDashboard' %}">Your Orders</a>
+          </li>
+          <li class="nav-item navbar">
+            <a class="nav-link" href="{% url 'index' %}">Inventory</a>
+          </li>
+          <li class="nav-item navbar">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          </li>
+
+        {% elif user.is_customer == True %}
+
+              <li class="nav-item navbar">
+            <a class="nav-link" href="{% url 'customerDashboard' %}">Your Dashboard</a>
+          </li>
+          <li class="nav-item navbar">
+            <a class="nav-link" href="{% url 'userCartView' %}">Your Cart</a>
+          </li>
+          <li class="nav-item navbar">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          </li>
+
+        {% else %}
+          <li class="nav-item navbar">
+            <a class="nav-link" href="{% url 'login' %}">Login</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+  </nav>
+<script type="text/javascript" src="{% static 'JavaScript/GLHJavaScript.js' %}" defer></script>
+{% block body_block %}
+{% endblock %}
+</body>
+</html>
