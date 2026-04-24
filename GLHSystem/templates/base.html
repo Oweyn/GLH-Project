@@ -16,6 +16,11 @@
     <title>GreenField Local Hub</title>
 </head>
 <body>
+<!-- Error handling -->
+{% for message in messages %}
+<div class="warning-message">{{ message }}</div>
+{% endfor %}
+
   <!--Left hand side of the nav bar-->
   <nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
@@ -52,10 +57,10 @@
       <ul class="navbar-nav ms-auto">
         {% if user.is_producer == True %}
           <li class="nav-item navbar">
-            <a class="nav-link" href="{% url 'producerDashboard' %}">Your Orders</a>
+            <a class="nav-link" href="{% url 'producerDashboard' %}">Your Dashbored</a>
           </li>
           <li class="nav-item navbar">
-            <a class="nav-link" href="{% url 'index' %}">Inventory</a>
+            <a class="nav-link" href="{% url 'producerStockManagement' %}">Inventory</a>
           </li>
           <li class="nav-item navbar">
             <a class="nav-link" href="{% url 'logout' %}">Logout</a>

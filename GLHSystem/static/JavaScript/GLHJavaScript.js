@@ -33,3 +33,13 @@ function hideDeliveryBox() {
     } else {
         box.classList.remove("hide-filter-mode");
     }}
+
+//Toggles the items in each order on customer dashbored
+function hideOrderItems() {
+    document.getElementById('order-item-box').classList.toggle("hide-filter-mode");
+}
+
+//Toggles the items in each order on customer dashbored
+function hideProducersProducts() {
+    document.getElementById('producer-product-box').classList.toggle("hide-filter-mode");
+}

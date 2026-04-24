@@ -1,4 +1,73 @@
 {% extends "base.html" %}
 {% block body_block %}
 <!--TODO: Add past order, loyalty points, the option to view and change personal details-->
+<h1>Hello, {{ user.first_name }}!</h1>
+
+<!-- Users personal information -->
+<div class="block">
+<h2>Here you can view your personal information</h2>
+<p>If this data is incorrect or out-dated, please don't hesitate to email us and have it rectified.</p>
+<p>You can also email us if you wish to view the data we collect, request account deletion, or object to how we process your data.</p>
+<p>Please note by using our site you agree to our terms and conditions avliable here:<a href="{% url 'index' %}">terms & conditions</a></p>
+
+<input type="text" value="First Name: {{user.first_name}}" disabled>
+<input type="text" value="Last Name: {{user.last_name}}" disabled>
+<input type="text" value="Email Address: {{user.email}}" disabled>
+<input type="text" value="Password: ********" disabled>
+</div>
+
+<!-- Loyalty point information -->
+<div class="block">
+<h3>Current loyalty points: {{user.user_loyalty_points}}</h3>
+<p> 100 points will give you £1 off your next order, head to the checkout to spend them</p>
+</div>
+
+<!-- Customers Ccrrent and past orders -->
+<h4>Your Orders</h4>
+
+{% if orders %}
+{% for order in orders %}
+<div class="block">
+<p>Reference number: #{{order.id}}</p>
+<p>Order placed at: {{ order.created_at|date:"d M Y H:i" }}</p>
+
+{% if order.delivery_order %}
+<p>Order for: delivery</p>
+{% else %}
+<p>Order for: collection</p>
+{% endif %}
+
+<p>Order delivered to: {{order.customer_delivery_address}}</p>
+<p>Total price: {{order.total_order_price}}</p>
+<p>Loyalty points earned: {{order.loyalty_points_earned}}</p>
+
+{% if order.is_completed %}
+<p>Order status: complete</p>
+{% else %}
+<p>Order status: incomplete</p>
+{% endif %}
+
+<button onclick="hideOrderItems()">Show order items</button>
+
+<!-- Items in order of most recently created -->
+<div class="row alternativeblock hide-filter-mode" id="order-item-box">
+{% for item in order.orderitem_set.all %}
+<div class="col-sm-6 col-md-4 col-lg-3 mb-4 block">
+<img src="{{ item.product.image.url }}" width="100">
+<h5>{{ item.product.name }}</h5>
+<p>{{ item.product.description }}</p>
+<p>£{{ item.product.price }} × {{ item.quantity }} = £{{ item.item_total }}</p>
+ </div>
+{% empty %}
+<p>This order has no items.</p>
+{% endfor %}
+</div>
+
+    </div>
+  {% endfor %}
+{% else %}
+  <p>You haven't placed any orders yet. 
+     <a href="/products/">Start shopping!</a>
+  </p>
+{% endif %}
 {% endblock %}

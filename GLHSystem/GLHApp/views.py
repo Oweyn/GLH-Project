@@ -10,6 +10,8 @@ from UserCarts.models import Cart, CartItem, get_user_cart
 from UserOrders.models import Order, OrderItem
 import math
 from decimal import Decimal
+from django.shortcuts import get_object_or_404
+from django.db import transaction
 #TODO: Consider shortinging imports?
 
 # Create your views here.
@@ -21,7 +23,7 @@ def aboutUs(request):
     return render(request, 'aboutUs.html')
 
 def individualProductPage(request, pk):
-    products = Product.objects.get(pk=pk)
+    products = get_object_or_404(Product, pk=pk)
     return render(request, 'individualProductPage.html', {'product': products})
 
 def producer(request):
@@ -29,7 +31,7 @@ def producer(request):
     return render(request, 'producer.html', {'producers': producers})
 
 def individualProducerPage(request, pk):
-    producer = ProducerAccount.objects.get(pk=pk)
+    producer = get_object_or_404(ProducerAccount, pk=pk)
     products = Product.objects.filter(producer=producer)
     return render(request, 'individualProducerPage.html', {'producer': producer, 'products': products})
 
@@ -53,6 +55,7 @@ def product(request):
 @login_required
 def addProduct(request):
     if not request.user.is_producer:
+        messages.error(request, "Sorry, you don't have permission to acess this page.")
         return render(request, 'index.html')#TODO: to change this to a redirect with an error message
 
     if request.method == "POST":
@@ -63,6 +66,7 @@ def addProduct(request):
             new_product.producer = request.user.produceraccount
             new_product.save()
             form.save_m2m()
+            messages.success(request,"Product added sucessefully.")
             return redirect('index')
     else:
         form = AddProductForm()
@@ -73,8 +77,15 @@ def addProduct(request):
 #TODO: Logic check
 @login_required
 def editProduct(request, pk):
-    permission = request.user.produceraccount
-    product = Product.objects.get(pk=pk)
+    if not request.user.is_producer:
+        return render(request, 'index.html')#TODO: to change this to a redirect
+    
+    product = get_object_or_404(Product, pk=pk)
+
+    if product.producer != request.user.produceraccount:
+        messages.error(request, "This isn't one of your products, you don't have permission to edit it")
+        return redirect('index')
+
     if request.method == "POST":
         form = EditProductForm(request.POST, request.FILES, instance=product)
 
@@ -96,7 +107,10 @@ def register(request):
         form = CustomUserCreationForm(request.POST) 
         if form.is_valid():
             form.save()
-        return redirect('login')
+            messages.success(request, "Your account creation was successful, welcome to GLH!")
+            return redirect('login')
+        else:
+            messages.error(request, "Account creation was unsucessful.")
     else:
         form = CustomUserCreationForm()
     return render(request, 'register.html', {"form": form})
@@ -108,9 +122,9 @@ def loginPage(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
             user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect('index')
+            if user:
+                login(request, user)
+                return redirect('index')
         else:
             messages.error(request, 'Incorrect username or password.')#TODO: Change to a python alert box or similair
     else:
@@ -123,34 +137,73 @@ def logoutPage(request):
         return redirect('index')
     return render(request, 'logout.html')
 
-#TODO: Logic check
 #Customer and producer dashboards
+#TODO: Logic check
+#TODO: this doesnt work
 @login_required
 def producerDashboard(request):
     if not request.user.is_producer:
+        messages.error(request, 'Sorry, you dont have permission to acess this page.')
         return render(request, 'index.html')#TODO: to change this to a redirect
     
-    producer = request.user.producer
-    producer_products = Product.objects.filter(producer=producer)
-    individual_order_items = OrderItem.objects.filter(product__producer=producer).select_related('order', 'order__user')
+    producer = request.user.produceraccount
+    producers_products = Product.objects.filter(producer=producer)
+    producers_order_items = (
+        OrderItem.objects
+        .filter(product__producer=producer)
+        .select_related('order', 'product')
+        .order_by('-order__created_at')
+    )
 
-        #if new_status in valid_statuses:
-     #   order = get_object_or_404(Order, id=order_id, items__product__producer=producer)
-      #  order.status = new_status
-       # order.save()
-        #Add success image
+    grouped_orders = {}
 
-        #return redirect('producer_dashboard')
+    for item in producers_order_items:
+        order = item.order
+        if order not in grouped_orders:
+            grouped_orders[order] = []
+        grouped_orders[order].append(item)
 
     return render(request, 'producerDashboard.html', {
-        'producer' : producer,
-        'producer_products' : producer_products,
-        'individual_order_items' : individual_order_items,
-        })
+        'producer': producer,
+        'producers_products': producers_products,
+        'producers_order_items': producers_order_items,
+    })
+
+
+@login_required
+def stockManagement(request):
+    if not request.user.is_producer:
+        messages.error(request, 'Sorry, you dont have permission to acess this page.')
+        return render(request, 'index.html')#TODO: to change this to a redirect
+    producer = request.user.produceraccount
+    producers_products = Product.objects.filter(producer=producer)
+
+    return render(request, 'producerManagementOfStock.html', {
+        'producer': producer,
+        'producers_products': producers_products,
+    })
+
+@login_required
+def increaseProductStock(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    product.stock += 1
+    product.save()
+    return redirect('producerStockManagement')
+
+@login_required
+def decreaseProductStock(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+
+    product.stock -= 1
+    if product.stock <= 0:
+        product.delete()
+    else:
+        product.save()
+    return redirect('producerStockManagement')
 
 @login_required
 def customerDashboard(request):
-    active_and_past_customer_orders = Order.objects.filter(customer=request.user)
+    active_and_past_customer_orders = Order.objects.filter(customer=request.user).order_by('-created_at')
     return render(request, 'customerDashboard.html',{
         'orders': active_and_past_customer_orders,
         'user': request.user,
@@ -183,12 +236,11 @@ def userCartView(request):
 #TODO: Consider a fucntion to avoid code redundancy or combining all these cart management functions
 @login_required
 def addProductToUserCart(request, pk):
-    #TODO: Add exception handling in case a product is not found
-    product = Product.objects.get(pk=pk)
+    product = get_object_or_404(Product, pk=pk)
     cart = get_user_cart(request.user)
 
     if product.stock < 1:
-    #TODO: Item out of stock error message as well as a redirect
+        messages.error(request, "Sorry, this item is now out of stock.")
         return redirect('userCartView')
     
     cart_item, created = CartItem.objects.get_or_create(
@@ -197,6 +249,7 @@ def addProductToUserCart(request, pk):
     )
 
     if cart_item.quantity >= product.stock:
+        messages.warning(request, "Sorry, this item is now out of stock.")
         return redirect('userCartView')
 
     cart_item.quantity += 1
@@ -205,11 +258,11 @@ def addProductToUserCart(request, pk):
 
 @login_required
 def increaseProductQuantityInCart(request, pk):
-    product = Product.objects.get(pk=pk)
+    product = get_object_or_404(Product, pk=pk)
     cart = get_user_cart(request.user)
 
     if product.stock < 1:
-    #TODO: Item out of stock error message as well as a redirect
+        messages.error(request, "Sorry, this item is now out of stock.")
         return redirect('userCartView')
 
     cart_item, created = CartItem.objects.get_or_create(
@@ -218,7 +271,7 @@ def increaseProductQuantityInCart(request, pk):
     )
     
     if cart_item.quantity >= product.stock:
-        #TODO: add an error message
+        messages.error(request, "Sorry, there are more of this item in your cart then is in stock.")
         return redirect('userCartView')
 
     cart_item.quantity += 1
@@ -227,7 +280,7 @@ def increaseProductQuantityInCart(request, pk):
 
 @login_required
 def decreaseProductQuantityOrDeleteProductInCart(request, pk):
-    product = Product.objects.get(pk=pk)
+    product = get_object_or_404(Product, pk=pk)
     cart = get_user_cart(request.user)
 
     if product.stock < 1:
@@ -240,7 +293,8 @@ def decreaseProductQuantityOrDeleteProductInCart(request, pk):
     cart_item.quantity -= 1
     if cart_item.quantity <= 0:
         cart_item.delete()
-    cart_item.save()
+    else:
+        cart_item.save()
     return redirect('userCartView')
 
 #Order system
@@ -249,7 +303,7 @@ def decreaseProductQuantityOrDeleteProductInCart(request, pk):
 def checkoutAndConfirmOrderDetails(request):
     user_cart = get_user_cart(request.user)
     if not user_cart:
-        #TODO: add error message
+        messages.error(request, "You don't have anything added to your cart")
         return redirect('userCartView')
     avilable_items = user_cart.cart_items.all()
         
@@ -262,7 +316,7 @@ def checkoutAndConfirmOrderDetails(request):
     
     for item in avilable_items:
         if item.quantity > item.product.stock:
-            #TODO: Need to add a now out of stock error message / or a disabled button
+            messages.error(request, "Sorry, this item is now out of stock.")
             return render(request, 'userCartView.html')
 
         cart_product = item.product
@@ -279,10 +333,12 @@ def checkoutAndConfirmOrderDetails(request):
 
 #This is where loyalty points are calculated    
 @login_required
+#This is important for the database, either an order goes through or it doesnt, this prevents half completed orders.
+@transaction.atomic
 def customerPlacesOrder(request):
     user_cart = get_user_cart(request.user)
     if not user_cart:
-        #TODO: Add error message
+        messages.error(request, "You don't have anything added to your cart")
         return redirect('userCartView')
     
     avilable_items = user_cart.cart_items.all()
@@ -294,7 +350,7 @@ def customerPlacesOrder(request):
 
     for item in avilable_items:
         if item.quantity > item.product.stock:
-            #TODO: Need to add a now out of stock error message
+            messages.error(request, "Sorry, this item is now out of stock.")
             return render(request, 'userCartView.html')
 
         cart_product = item.product
@@ -348,5 +404,5 @@ def customerPlacesOrder(request):
 
 @login_required
 def customerOrderConfirmation(request, order_id):
-    order = Order.objects.get(id=order_id, customer=request.user)
+    order = get_object_or_404(Order, id=order_id, customer=request.user)
     return render(request, 'customerOrderConfirmation.html', {'order': order})

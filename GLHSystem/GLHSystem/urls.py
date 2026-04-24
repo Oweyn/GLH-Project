@@ -34,10 +34,14 @@ urlpatterns = [
     path('product/<int:pk>/', views.individualProductPage, name='individualProductPage'),
     path('producer/<int:pk>/', views.individualProducerPage, name='individualProducerPage'),
 
-    #Producer specific
+    #Producer specific - management
     path('add-product/', views.addProduct, name='addProduct'),
     path('edit-product/', views.editProduct, name='editProduct'),
     path('producer-dashboard/', views.producerDashboard, name='producerDashboard'),
+    path('producer-management-of-stock/', views.stockManagement, name='producerStockManagement'),
+
+    path('increase-product-stock/<int:pk>', views.increaseProductStock, name='increaseProductStock'),
+    path('decrease-product-stock/<int:pk>', views.decreaseProductStock, name='decreaseProductStock'),
 
     #Customer specific
     path('customer-dashboard/', views.customerDashboard, name='customerDashboard'),
