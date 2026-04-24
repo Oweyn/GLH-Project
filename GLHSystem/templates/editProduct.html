@@ -1,4 +1,13 @@
 {% extends "base.html" %}
 {% block body_block %}
 
+<!--Only producers should be able to acess this page-->
+<h1>Edit Product</h1>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+<button type="submit">Edit</button>
+
+  
+  </form>
 {% endblock %}

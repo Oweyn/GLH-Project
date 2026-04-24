@@ -35,11 +35,12 @@ def individualProducerPage(request, pk):
     products = Product.objects.filter(producer=producer)
     return render(request, 'individualProducerPage.html', {'producer': producer, 'products': products})
 
-#Includes the allergen filter
+#Includes the allergen filter - items not in stock wont show
 def product(request):
-    products = Product.objects.all()
+    products = Product.objects.filter(stock__gt=0)
     allergens = Allergen.objects.all()
     allergens = Allergen.objects.exclude(allergen_name="No applicable allergens")
+
     selected_allergens = request.GET.getlist('product_allergens')
     
     if selected_allergens:

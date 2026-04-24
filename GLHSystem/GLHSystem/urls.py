@@ -36,7 +36,7 @@ urlpatterns = [
 
     #Producer specific - management
     path('add-product/', views.addProduct, name='addProduct'),
-    path('edit-product/', views.editProduct, name='editProduct'),
+    path('edit-product/<int:pk>', views.editProduct, name='editProduct'),
     path('producer-dashboard/', views.producerDashboard, name='producerDashboard'),
     path('producer-management-of-stock/', views.stockManagement, name='producerStockManagement'),
 

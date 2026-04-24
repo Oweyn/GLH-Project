@@ -25,27 +25,25 @@
 <button onclick="hideOrderItems()">Toggle active orders</button>
 
 {% for item in producers_order_items %}
-    {% if not item.order.is_completed %}
-        <div class="block">
-            <p>Reference number: #{{ item.order.id }}</p>
-            <p>Order placed at: {{ item.order.created_at|date:"d M Y H:i" }}</p>
+<div class="block">
+<p>Reference number: #{{ item.order.id }}</p>
+<p>Order placed at: {{ item.order.created_at|date:"d M Y H:i" }}</p>
+{% if item.order.delivery_order %}
+<p>Order for: delivery</p>
+{% else %}
+<p>Order for: collection</p>
+{% endif %}
 
-            {% if item.order.delivery_order %}
-                <p>Order for: delivery</p>
-            {% else %}
-                <p>Order for: collection</p>
-            {% endif %}
+<div class="row alternativeblock order-item-box">
+<div class="col-sm-6 col-md-4 col-lg-3 mb-4 block">
+<img src="{{ item.product.image.url }}" width="100">
 
-            <div class="row alternativeblock hide-filter-mode order-item-box">
-                <div class="col-sm-6 col-md-4 col-lg-3 mb-4 block">
-                    <img src="{{ item.product.image.url }}" width="100">
-                    <h5>{{ item.product.name }}</h5>
-                    <p>{{ item.product.description }}</p>
-                    <p>£{{ item.product.price }} × {{ item.quantity }}</p>
+<h5>{{ item.product.name }}</h5>
+<p>{{ item.product.description }}</p>
+<p>£{{ item.product.price }} × {{ item.quantity }}</p>
                 </div>
             </div>
         </div>
-    {% endif %}
 {% endfor %}
 </div>
 {% endblock %}
